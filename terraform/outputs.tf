@@ -5,7 +5,7 @@ output "droplet_ip" {
 
 output "ansible_inventory" {
   value = templatefile("${path.module}/../ansible/inventory/inventory.yml.tpl", {
-    droplet_ip = digitalocean_droplet.drop_test.ipv4_address
+    droplet_ip   = digitalocean_droplet.drop_test.ipv4_address
+    droplet_name = var.droplet_name
   })
-  description = "Rendered Ansible inventory file"
 }

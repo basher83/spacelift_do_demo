@@ -21,7 +21,7 @@ resource "digitalocean_droplet" "drop_test" {
   ssh_keys = [
     var.ssh_fingerprint
   ]
-  user_data = templatefile("digitalocean.tftpl", {
+  user_data = templatefile("${path.module}/digitalocean.tftpl", {
     public_key = var.staging_public_key
   })
 }
@@ -65,7 +65,7 @@ variable "droplet_size" {
 }
 
 variable "staging_public_key" {
-  description = "Public SSH key for Ansible user, provided via env0 variable."
+  description = "Public SSH key for Ansible user, provided via Spacelift variable."
   type        = string
   sensitive   = true
 }

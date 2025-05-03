@@ -30,17 +30,18 @@ resource "spacelift_run_hook" "create_inventory" {
 # Get Terraform outputs
 output_json=$(spacectl stack output get -s "${spacelift_stack.terraform.id}" -o terraform_outputs)
 
-# Extract the droplet IP
+# Extract the droplet IP and name
 droplet_ip=$(echo $output_json | jq -r '.droplet_ip')
+droplet_name=$(echo $output_json | jq -r '.droplet_name')
 
 # Create the inventory file
 mkdir -p inventory
-cat > inventory/hosts.yml << EOF
+cat > inventory/inventory.yml << EOF
 all:
   children:
     webservers:
       hosts:
-        drop-test-v3:
+        $droplet_name:
           ansible_host: $droplet_ip
           ansible_user: ansible
           ansible_ssh_private_key_file: /mnt/workspace/.ssh/id_rsa

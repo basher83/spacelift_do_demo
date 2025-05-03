@@ -1,5 +1,10 @@
 # ansible/roles/app/tasks/main.yml
 ---
+- name: Install required Ansible collections
+  ansible.builtin.shell: ansible-galaxy collection install community.docker
+  delegate_to: localhost
+  run_once: true
+  
 - name: Create application directory
   file:
     path: "/home/ansible/app"
