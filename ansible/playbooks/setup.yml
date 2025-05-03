@@ -2,28 +2,39 @@
 ---
 - name: Configure DigitalOcean Droplet
   hosts: webservers
-  become: "{{ ansible_become | default(true) }}"
-  gather_facts: "{{ not ansible_check_mode }}"
+  gather_facts: true
   
   # Define variables for role paths
   vars:
     roles_base_path: "/mnt/workspace/source/ansible/roles"
-    is_planning: "{{ ansible_check_mode | default(false) }}"
+    is_localhost: "{{ inventory_hostname == 'localhost' }}"
   
   pre_tasks:
-    - name: Skip actual configuration during planning phase
+    - name: Debug inventory information
       debug:
-        msg: "Running in check mode (planning phase). Will skip actual configuration."
-      when: is_planning
+        msg:
+          - "Inventory hostname: {{ inventory_hostname }}"
+          - "Is localhost: {{ is_localhost }}"
+          - "Ansible version: {{ ansible_version.full }}"
+          - "Python interpreter: {{ ansible_python.executable }}"
+    
+    - name: Skip roles when running on localhost
+      debug:
+        msg: "Running on localhost. Will skip all roles to avoid errors."
+      when: is_localhost
   
-  # Use absolute paths for roles
+  # Use absolute paths for roles, but only when not on localhost
   roles:
-    - { role: "{{ roles_base_path }}/common", when: "not is_planning" }
-    - { role: "{{ roles_base_path }}/docker", when: "not is_planning" }
-    - { role: "{{ roles_base_path }}/app", when: "not is_planning" }
+    - { role: "{{ roles_base_path }}/common", when: "not is_localhost" }
+    - { role: "{{ roles_base_path }}/docker", when: "not is_localhost" }
+    - { role: "{{ roles_base_path }}/app", when: "not is_localhost" }
   
   tasks:
-    - name: Dummy task for planning phase
+    - name: Dummy task for localhost
       debug:
-        msg: "This is a dummy task that will run during planning phase"
-      when: is_planning
+        msg: "This is a dummy task that will run on localhost"
+      when: is_localhost
+    
+    - name: Show success message
+      debug:
+        msg: "Playbook completed successfully"

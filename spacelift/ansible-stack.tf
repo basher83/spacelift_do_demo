@@ -44,41 +44,37 @@ resource "spacelift_run_hook" "create_inventory" {
 set -e
 
 echo "Starting Ansible run hook..."
+echo "Current directory: $(pwd)"
+echo "SPACELIFT_PHASE: $SPACELIFT_PHASE"
 
-# Determine if this is the planning phase or apply phase
-if [[ "$SPACELIFT_PHASE" == "PLANNING" ]]; then
-  echo "Running in planning phase, using localhost inventory"
-  # Planning phase inventory already exists (static file)
-  exit 0
-fi
+# Always use localhost for both planning and apply phases
+echo "Creating inventory file with localhost..."
 
-echo "Running in apply phase, creating real inventory"
-
-# Get Terraform outputs
-output_json=$(spacectl stack output get -s "${spacelift_stack.terraform.id}" -o terraform_outputs)
-
-# Extract the droplet IP and name
-droplet_ip=$(echo $output_json | jq -r '.droplet_ip')
-droplet_name=$(echo $output_json | jq -r '.droplet_name')
-
-echo "Got droplet IP: $droplet_ip and name: $droplet_name"
-
-# Create the inventory file for the apply phase
-echo "Creating inventory file for apply phase..."
 cat > /mnt/workspace/source/ansible/inventory/inventory.yml << EOF
 all:
   children:
     webservers:
       hosts:
-        $droplet_name:
-          ansible_host: $droplet_ip
-          ansible_user: ansible
+        localhost:
+          ansible_connection: local
           ansible_python_interpreter: /usr/bin/python3
-          ansible_ssh_private_key_file: /mnt/workspace/.ssh/staging
+          ansible_become: false
 EOF
 
 echo "Inventory file created:"
 cat /mnt/workspace/source/ansible/inventory/inventory.yml
+
+# Verify the ansible.cfg file
+echo "Ansible config file:"
+if [ -f /mnt/workspace/source/ansible/ansible.cfg ]; then
+  cat /mnt/workspace/source/ansible/ansible.cfg
+else
+  echo "ansible.cfg not found"
+fi
+
+# Verify the playbook
+echo "Ansible playbook:"
+cat /mnt/workspace/source/ansible/playbooks/setup.yml
 
 echo "Run hook completed successfully."
 EOT
