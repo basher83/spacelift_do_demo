@@ -11,6 +11,9 @@ resource "spacelift_stack" "ansible" {
 
   # Define push policy
   ansible_playbook = "playbooks/setup.yml"
+
+  # Add additional Ansible arguments if needed
+  ansible_arguments = ["-v", "--extra-vars", "ansible_python_interpreter=/usr/bin/python3"]
 }
 
 # Create a dependency so this stack runs after the Terraform stack
@@ -34,7 +37,7 @@ output_json=$(spacectl stack output get -s "${spacelift_stack.terraform.id}" -o 
 droplet_ip=$(echo $output_json | jq -r '.droplet_ip')
 droplet_name=$(echo $output_json | jq -r '.droplet_name')
 
-# Create the inventory file
+# Create the inventory file in the correct location
 mkdir -p inventory
 cat > inventory/inventory.yml << EOF
 all:
@@ -46,6 +49,9 @@ all:
           ansible_user: ansible
           ansible_ssh_private_key_file: /mnt/workspace/.ssh/staging
 EOF
+
+# Verify the inventory file is valid
+ansible-inventory --inventory=inventory/inventory.yml --list
 
 echo "Created Ansible inventory with droplet IP: $droplet_ip"
 EOT
