@@ -16,6 +16,7 @@ resource "spacelift_stack" "ansible" {
   ansible_arguments = [
     "-v",
     "--extra-vars", "ansible_python_interpreter=/usr/bin/python3",
+    "--limit=localhost",
     "--inventory=/mnt/workspace/source/ansible/inventory/inventory.yml",
     "--module-path=/mnt/workspace/source/ansible/library",
     "--roles-path=/mnt/workspace/source/ansible/roles"
@@ -47,10 +48,10 @@ echo "Starting Ansible run hook..."
 echo "Current directory: $(pwd)"
 echo "SPACELIFT_PHASE: $SPACELIFT_PHASE"
 
-# Always use localhost for both planning and apply phases
-echo "Creating inventory file with localhost..."
+# Create a clean inventory file with only localhost
+echo "Creating clean inventory file with only localhost..."
 
-cat > /mnt/workspace/source/ansible/inventory/inventory.yml << EOF
+cat > /mnt/workspace/source/ansible/inventory/inventory.yml << 'EOF'
 all:
   children:
     webservers:
@@ -64,13 +65,24 @@ EOF
 echo "Inventory file created:"
 cat /mnt/workspace/source/ansible/inventory/inventory.yml
 
-# Verify the ansible.cfg file
-echo "Ansible config file:"
-if [ -f /mnt/workspace/source/ansible/ansible.cfg ]; then
-  cat /mnt/workspace/source/ansible/ansible.cfg
-else
-  echo "ansible.cfg not found"
-fi
+# Create a custom ansible.cfg file in the home directory
+echo "Creating custom ansible.cfg in home directory..."
+mkdir -p ~/.ansible
+cat > ~/.ansible/ansible.cfg << 'EOF'
+[defaults]
+inventory = /mnt/workspace/source/ansible/inventory/inventory.yml
+host_key_checking = False
+roles_path = /mnt/workspace/source/ansible/roles
+timeout = 30
+localhost_warning = False
+
+[ssh_connection]
+pipelining = True
+EOF
+
+# Export ANSIBLE_CONFIG environment variable
+export ANSIBLE_CONFIG=~/.ansible/ansible.cfg
+echo "ANSIBLE_CONFIG set to $ANSIBLE_CONFIG"
 
 # Verify the playbook
 echo "Ansible playbook:"
