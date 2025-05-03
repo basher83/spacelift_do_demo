@@ -2,14 +2,28 @@
 ---
 - name: Configure DigitalOcean Droplet
   hosts: webservers
-  become: true
+  become: "{{ ansible_become | default(true) }}"
+  gather_facts: "{{ not ansible_check_mode }}"
   
   # Define variables for role paths
   vars:
     roles_base_path: "/mnt/workspace/source/ansible/roles"
+    is_planning: "{{ ansible_check_mode | default(false) }}"
+  
+  pre_tasks:
+    - name: Skip actual configuration during planning phase
+      debug:
+        msg: "Running in check mode (planning phase). Will skip actual configuration."
+      when: is_planning
   
   # Use absolute paths for roles
   roles:
-    - { role: "{{ roles_base_path }}/common" }
-    - { role: "{{ roles_base_path }}/docker" }
-    - { role: "{{ roles_base_path }}/app" }
+    - { role: "{{ roles_base_path }}/common", when: "not is_planning" }
+    - { role: "{{ roles_base_path }}/docker", when: "not is_planning" }
+    - { role: "{{ roles_base_path }}/app", when: "not is_planning" }
+  
+  tasks:
+    - name: Dummy task for planning phase
+      debug:
+        msg: "This is a dummy task that will run during planning phase"
+      when: is_planning
