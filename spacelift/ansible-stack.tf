@@ -48,10 +48,21 @@ echo "Starting Ansible run hook..."
 echo "Current directory: $(pwd)"
 echo "SPACELIFT_PHASE: $SPACELIFT_PHASE"
 
+# List all files in the inventory directory
+echo "Listing all files in the inventory directory:"
+ls -la /mnt/workspace/source/ansible/inventory/
+
+# Remove any existing inventory files that might be causing issues
+echo "Removing any existing inventory files that might be causing issues..."
+rm -f /mnt/workspace/source/ansible/inventory/*.yml.tpl
+rm -f /mnt/workspace/source/ansible/inventory/*.tpl
+
 # Create a clean inventory file with only localhost
 echo "Creating clean inventory file with only localhost..."
 
 cat > /mnt/workspace/source/ansible/inventory/inventory.yml << 'EOF'
+# This is a static inventory file for Spacelift
+# It only contains localhost to avoid connection errors
 all:
   children:
     webservers:
@@ -84,9 +95,9 @@ EOF
 export ANSIBLE_CONFIG=~/.ansible/ansible.cfg
 echo "ANSIBLE_CONFIG set to $ANSIBLE_CONFIG"
 
-# Verify the playbook
-echo "Ansible playbook:"
-cat /mnt/workspace/source/ansible/playbooks/setup.yml
+# List all files in the inventory directory again
+echo "Listing all files in the inventory directory after changes:"
+ls -la /mnt/workspace/source/ansible/inventory/
 
 echo "Run hook completed successfully."
 EOT
