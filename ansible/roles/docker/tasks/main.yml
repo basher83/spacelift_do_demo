@@ -1,0 +1,21 @@
+# ansible/roles/docker/tasks/main.yml
+---
+# Docker is already installed by cloud-init in your template
+# This role handles additional Docker configurations
+
+- name: Create docker group if it doesn't exist
+  group:
+    name: docker
+    state: present
+
+- name: Add ansible user to docker group
+  user:
+    name: ansible
+    groups: docker
+    append: yes
+
+- name: Install docker-compose
+  get_url:
+    url: https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'

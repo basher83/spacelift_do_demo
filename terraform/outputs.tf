@@ -1,0 +1,11 @@
+output "droplet_ip" {
+  value       = digitalocean_droplet.drop_test.ipv4_address
+  description = "The public IPv4 address of the droplet"
+}
+
+output "ansible_inventory" {
+  value = templatefile("${path.module}/inventory.yml.tpl", {
+    droplet_ip = digitalocean_droplet.drop_test.ipv4_address
+  })
+  description = "Rendered Ansible inventory file"
+}

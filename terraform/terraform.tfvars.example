@@ -1,0 +1,6 @@
+do_token               = "your_token_here"
+ssh_fingerprint         = "digitalocean_ssh_fingerprint"
+droplet_image          = "ubuntu-24-04-x64"
+droplet_region         = "nyc1"
+droplet_size           = "s-1vcpu-1gb"
+staging_public_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKls14HDdv2r2QIhGQfEluBmzrGI2cxjwtdkAWrc4ZRr"

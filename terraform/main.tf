@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     digitalocean = {
-      source = "digitalocean/digitalocean"
+      source  = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
   }
@@ -12,23 +12,18 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_droplet" "drop_test" {
-  image              = var.droplet_image
-  name               = "drop-test-v3"
-  region             = var.droplet_region
-  size               = var.droplet_size
-  backups            = false
-  monitoring         = false
-    ssh_keys = [
+  image      = var.droplet_image
+  name       = "drop-test-v3"
+  region     = var.droplet_region
+  size       = var.droplet_size
+  backups    = false
+  monitoring = false
+  ssh_keys = [
     var.ssh_fingerprint
   ]
   user_data = templatefile("digitalocean.tftpl", {
-    public_key = var.STAGING_PUBLIC_KEY
+    public_key = var.staging_public_key
   })
-}
-
-output "droplet_ip" {
-  value       = digitalocean_droplet.drop_test.ipv4_address
-  description = "The public IPv4 address of the droplet"
 }
 
 variable "do_token" {
@@ -39,7 +34,7 @@ variable "do_token" {
 }
 
 variable "ssh_fingerprint" {
-  description = "Fingerprint of your SSH key"
+  description = "Fingerprint of your SSH key in DigitalOcean"
   type        = string
   default     = ""
   sensitive   = true
@@ -63,7 +58,7 @@ variable "droplet_size" {
   default     = "s-1vcpu-1gb"
 }
 
-variable "STAGING_PUBLIC_KEY" {
+variable "staging_public_key" {
   description = "Public SSH key for Ansible user, provided via env0 variable."
   type        = string
   sensitive   = true

@@ -1,0 +1,29 @@
+# ansible/roles/common/tasks/main.yml
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - curl
+    - wget
+    - htop
+    - git
+    - vim
+    - ufw
+
+- name: Configure UFW
+  ufw:
+    state: enabled
+    policy: deny
+    rule: allow
+    port: "{{ item }}"
+  loop:
+    - "22"
+    - "80"
+    - "443"

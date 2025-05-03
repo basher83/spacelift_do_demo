@@ -1,0 +1,22 @@
+# ansible/roles/app/tasks/main.yml
+---
+- name: Create application directory
+  file:
+    path: "/home/ansible/app"
+    state: directory
+    owner: ansible
+    group: ansible
+    mode: '0755'
+
+- name: Copy docker-compose.yml file
+  template:
+    src: docker-compose.yml.j2
+    dest: "/home/ansible/app/docker-compose.yml"
+    owner: ansible
+    group: ansible
+    mode: '0644'
+
+- name: Start application with Docker Compose
+  community.docker.docker_compose:
+    project_src: "/home/ansible/app"
+    state: present

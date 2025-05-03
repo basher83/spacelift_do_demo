@@ -1,0 +1,10 @@
+# ansible/roles/app/templates/docker-compose.yml.j2
+services:
+  app:
+    image: nginx:latest
+    container_name: webapp
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html

@@ -1,0 +1,10 @@
+# ansible/playbooks/setup.yml
+---
+- name: Configure DigitalOcean Droplet
+  hosts: webservers
+  become: true
+  
+  roles:
+    - common
+    - docker
+    - app
