@@ -62,11 +62,11 @@ Before using this repository, you need:
 2. Add the following environment variables:
 
    - `TF_VAR_do_token`: Your DigitalOcean API token
-   - `TF_VAR_ssh_fingerprint`: Your SSH key fingerprint from DigitalOcean (eb:54:57:c9:f7:9c:be:2b:4b:e1:69:41:89:d1:ea:b1)
+   - `TF_VAR_ssh_fingerprint`: Your SSH key fingerprint from DigitalOcean
    - `TF_VAR_staging_public_key`: Your SSH public key content
 
 3. Add the following mounted file:
-   - Path: `.ssh/id_rsa`
+   - Path: `.ssh/staging`
    - Content: Your SSH private key
 
 #### Create the Terraform Stack
@@ -167,7 +167,7 @@ Common issues and solutions:
 1. **SSH Connection Failures**:
 
    - Verify SSH key paths and permissions
-   - Ensure the private key is properly mounted in Spacelift at `/mnt/workspace/.ssh/id_rsa`
+   - Ensure the private key is properly mounted in Spacelift at `/mnt/workspace/.ssh/staging`
    - Check firewall rules on the droplet
    - Verify the ansible user was created correctly in cloud-init
 

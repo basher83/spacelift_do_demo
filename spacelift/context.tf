@@ -22,7 +22,7 @@ resource "spacelift_environment_variable" "ssh_key" {
 # Upload SSH private key as a mounted file
 resource "spacelift_mounted_file" "ssh_private_key" {
   context_id    = spacelift_context.terraform_ansible_demo.id
-  relative_path = ".ssh/id_rsa"
+  relative_path = ".ssh/staging"
   content       = "your-ssh-private-key-placeholder" # Set through Spacelift UI
   write_only    = true
 }
