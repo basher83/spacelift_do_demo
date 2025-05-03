@@ -2,7 +2,7 @@
 resource "spacelift_stack" "terraform" {
   name         = "do-terraform-stack"
   description  = "Stack for deploying DigitalOcean infrastructure with Terraform"
-  repository   = "your-github-repo"
+  repository   = "basher83/spacelift_do_demo"
   branch       = "main"
   project_root = "terraform"
 

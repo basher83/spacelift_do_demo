@@ -14,7 +14,7 @@ resource "spacelift_environment_variable" "do_token" {
 
 resource "spacelift_environment_variable" "ssh_key" {
   context_id = spacelift_context.terraform_ansible_demo.id
-  name       = "TF_VAR_STAGING_PUBLIC_KEY"
+  name       = "TF_VAR_staging_public_key"
   value      = "your-ssh-public-key-placeholder" # Set through Spacelift UI
   write_only = true
 }
@@ -25,4 +25,11 @@ resource "spacelift_mounted_file" "ssh_private_key" {
   relative_path = ".ssh/id_rsa"
   content       = "your-ssh-private-key-placeholder" # Set through Spacelift UI
   write_only    = true
+}
+
+resource "spacelift_environment_variable" "ssh_fingerprint" {
+  context_id = spacelift_context.terraform_ansible_demo.id
+  name       = "TF_VAR_ssh_fingerprint"
+  value      = "your-ssh-fingerprint-placeholder"
+  write_only = true
 }

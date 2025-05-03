@@ -13,7 +13,7 @@ provider "digitalocean" {
 
 resource "digitalocean_droplet" "drop_test" {
   image      = var.droplet_image
-  name       = "drop-test-v3"
+  name       = var.droplet_name
   region     = var.droplet_region
   size       = var.droplet_size
   backups    = false
@@ -44,6 +44,12 @@ variable "droplet_image" {
   description = "Image identifier of the OS in DigitalOcean"
   type        = string
   default     = "ubuntu-24-04-x64"
+}
+
+variable "droplet_name" {
+  description = "Name of the DigitalOcean droplet"
+  type        = string
+  default     = "drop-test-v3"
 }
 
 variable "droplet_region" {

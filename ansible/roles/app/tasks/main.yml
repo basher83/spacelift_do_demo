@@ -8,6 +8,22 @@
     group: ansible
     mode: '0755'
 
+- name: Create HTML directory
+  file:
+    path: "/home/ansible/app/html"
+    state: directory
+    owner: ansible
+    group: ansible
+    mode: '0755'
+
+- name: Create index.html
+  copy:
+    content: "<html><body><h1>Hello from Spacelift!</h1></body></html>"
+    dest: "/home/ansible/app/html/index.html"
+    owner: ansible
+    group: ansible
+    mode: '0644'
+
 - name: Copy docker-compose.yml file
   template:
     src: docker-compose.yml.j2

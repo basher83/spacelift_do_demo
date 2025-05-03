@@ -2,7 +2,7 @@
 resource "spacelift_stack" "ansible" {
   name         = "do-ansible-stack"
   description  = "Stack for configuring DigitalOcean droplet with Ansible"
-  repository   = "your-github-repo"
+  repository   = "basher83/spacelift_do_demo"
   branch       = "main"
   project_root = "ansible"
 
