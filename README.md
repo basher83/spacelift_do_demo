@@ -16,7 +16,7 @@ The entire workflow is orchestrated by Spacelift, which manages dependencies bet
 ```
 spacelift-do-demo/
 ├── terraform/                  # Terraform configuration for DigitalOcean
-│   ├── main.tf                 # Main Terraform configuration
+│   ├── main.tf                 # Main Terraform configuration with variables
 │   ├── outputs.tf              # Output variables for Ansible
 │   ├── digitalocean.tftpl      # Cloud-init template for droplet initialization
 │   └── terraform.tfvars.example # Example variables (do not include secrets)
@@ -103,10 +103,12 @@ Before using this repository, you need:
 - **Image**: Ubuntu 24.04 x64
 - **Size**: s-1vcpu-1gb (Basic Droplet)
 - **Region**: NYC1
+- **Name**: Configurable via `droplet_name` variable (default: "drop-test-v3")
 - **Configuration**:
   - Ansible user with sudo access
   - Python3 and pip installed
-  - Docker installed via cloud-init
+  - ZSH shell installed
+  - Docker installed via secure installation script
 
 ### Ansible Configuration
 
@@ -122,21 +124,31 @@ The Ansible playbook configures the droplet with:
 
    - Docker group configuration
    - User permissions
-   - Docker Compose installation
 
 3. **App Role**:
-   - Simple Nginx web server via Docker
+   - Required Ansible collections (community.docker)
+   - HTML directory with sample content
+   - Nginx web server via Docker (pinned to specific version)
    - Container configuration
 
 ## How It Works
 
 1. When code is pushed to the repository, Spacelift detects the changes
 2. The Terraform stack runs first, provisioning the DigitalOcean droplet
-3. Terraform outputs (like the droplet IP) are stored in Spacelift
+3. Terraform outputs (like the droplet IP and name) are stored in Spacelift
 4. When the Terraform stack completes, it triggers the Ansible stack
 5. The Ansible stack uses a pre-run hook to generate an inventory file from the Terraform outputs
 6. Ansible configures the droplet according to the defined roles
 7. The entire workflow completes automatically, resulting in a fully provisioned and configured server
+
+## Parameterization and Reusability
+
+This project uses parameterization to enhance reusability:
+
+1. **Droplet Configuration**: All droplet settings (name, size, region, image) are parameterized in Terraform variables
+2. **Dynamic Inventory**: The Ansible inventory is dynamically generated using the droplet name and IP from Terraform outputs
+3. **Consistent Paths**: All file paths use proper relative path references to ensure consistency across environments
+4. **Version Pinning**: Docker and container images are pinned to specific versions for stability
 
 ## Extending the Project
 
@@ -146,6 +158,7 @@ You can extend this project by:
 2. Creating additional Ansible roles for specialized configurations
 3. Adding integration tests to verify the infrastructure
 4. Implementing policy checks in Spacelift to enforce compliance
+5. Adding monitoring and alerting configurations
 
 ## Troubleshooting
 
@@ -154,19 +167,33 @@ Common issues and solutions:
 1. **SSH Connection Failures**:
 
    - Verify SSH key paths and permissions
-   - Ensure the private key is properly mounted in Spacelift
+   - Ensure the private key is properly mounted in Spacelift at `/mnt/workspace/.ssh/id_rsa`
    - Check firewall rules on the droplet
+   - Verify the ansible user was created correctly in cloud-init
 
 2. **Terraform Failures**:
 
    - Verify DigitalOcean API token permissions
    - Check resource quotas in your DigitalOcean account
    - Validate Terraform syntax with `terraform validate`
+   - Ensure path references use `${path.module}` for consistency
 
 3. **Ansible Failures**:
    - Check inventory generation in the pre-run hook
+   - Verify the inventory file is created at the correct location (`inventory/inventory.yml`)
+   - Ensure the community.docker collection is installed successfully
    - Verify Python installation on the target server
-   - Ensure Ansible roles have correct permissions
+   - Check that the HTML directory is created and accessible
+
+## Security Best Practices
+
+This project implements several security best practices:
+
+1. **Secure Docker Installation**: Docker is installed using a downloaded script that can be verified
+2. **Version Pinning**: All software versions are pinned to specific releases
+3. **Firewall Configuration**: UFW is configured to only allow necessary ports
+4. **SSH Hardening**: Password authentication is disabled, only key-based authentication is allowed
+5. **Least Privilege**: The Ansible user has only the necessary permissions
 
 ## Resources
 
@@ -174,6 +201,7 @@ Common issues and solutions:
 - [Terraform Documentation](https://www.terraform.io/docs/)
 - [DigitalOcean API Documentation](https://docs.digitalocean.com/reference/api/)
 - [Ansible Documentation](https://docs.ansible.com/)
+- [Docker Documentation](https://docs.docker.com/)
 
 ## License
 
