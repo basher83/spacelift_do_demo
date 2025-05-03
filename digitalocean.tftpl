@@ -1,0 +1,19 @@
+#cloud-config
+ssh_pwauth: false
+users:
+- name: ansible
+  gecos: Ansible User
+  groups: sudo
+  sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+  shell: /usr/bin/zsh
+  lock_passwd: true
+  ssh_authorized_keys:
+      - ${public_key}
+
+packages:
+  - python3
+  - python3-pip
+
+runcmd:
+  - set -e
+  - curl -fsSL https://get.docker.com | sh
