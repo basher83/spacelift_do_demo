@@ -1,7 +1,7 @@
 # ansible/roles/app/templates/docker-compose.yml.j2
 services:
   app:
-    image: nginx:latest
+    image: lscr.io/linuxserver/nginx:1.26.3
     container_name: webapp
     restart: unless-stopped
     ports:
