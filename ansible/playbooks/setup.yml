@@ -4,7 +4,12 @@
   hosts: webservers
   become: true
   
+  # Define variables for role paths
+  vars:
+    roles_base_path: "/mnt/workspace/source/ansible/roles"
+  
+  # Use absolute paths for roles
   roles:
-    - common
-    - docker
-    - app
+    - { role: "{{ roles_base_path }}/common" }
+    - { role: "{{ roles_base_path }}/docker" }
+    - { role: "{{ roles_base_path }}/app" }

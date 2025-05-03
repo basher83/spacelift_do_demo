@@ -54,30 +54,7 @@ droplet_name=$(echo $output_json | jq -r '.droplet_name')
 
 echo "Got droplet IP: $droplet_ip and name: $droplet_name"
 
-# Fix permissions on ansible directory to avoid world-writable warning
-echo "Fixing permissions on ansible directory..."
-chmod -R 755 /mnt/workspace/source/ansible
-
-# Create a specific ansible.cfg file in a non-world-writable location
-echo "Creating ansible.cfg in home directory..."
-mkdir -p ~/.ansible
-cat > ~/.ansible/ansible.cfg << EOF
-[defaults]
-inventory = /mnt/workspace/source/ansible/inventory/inventory.yml
-remote_user = ansible
-host_key_checking = False
-roles_path = /mnt/workspace/source/ansible/roles
-timeout = 30
-
-[ssh_connection]
-pipelining = True
-EOF
-
-# Set ANSIBLE_CONFIG environment variable
-export ANSIBLE_CONFIG=~/.ansible/ansible.cfg
-echo "ANSIBLE_CONFIG set to $ANSIBLE_CONFIG"
-
-# Create the inventory file with absolute paths
+# Create the inventory file
 echo "Creating inventory file..."
 cat > /mnt/workspace/source/ansible/inventory/inventory.yml << EOF
 all:
@@ -90,34 +67,9 @@ all:
           ansible_ssh_private_key_file: /mnt/workspace/.ssh/staging
 EOF
 
-# Verify the inventory file
-echo "Verifying inventory file..."
-ls -la /mnt/workspace/source/ansible/inventory/
+echo "Inventory file created:"
 cat /mnt/workspace/source/ansible/inventory/inventory.yml
 
-# Verify roles directory
-echo "Verifying roles directory..."
-ls -la /mnt/workspace/source/ansible/roles/
-
-# Create symbolic links for roles in the expected locations
-echo "Creating symbolic links for roles..."
-mkdir -p /mnt/workspace/source/ansible/playbooks/roles
-mkdir -p /mnt/workspace/source/ansible/.spacelift/.ansible/roles
-
-# Link each role to the expected locations
-for role in /mnt/workspace/source/ansible/roles/*; do
-  role_name=$(basename "$role")
-  echo "Linking role $role_name..."
-  ln -sf "$role" "/mnt/workspace/source/ansible/playbooks/roles/$role_name"
-  ln -sf "$role" "/mnt/workspace/source/ansible/.spacelift/.ansible/roles/$role_name"
-done
-
-# Verify the links
-echo "Verifying role links in playbooks/roles..."
-ls -la /mnt/workspace/source/ansible/playbooks/roles/
-echo "Verifying role links in .spacelift/.ansible/roles..."
-ls -la /mnt/workspace/source/ansible/.spacelift/.ansible/roles/
-
-echo "Run hook completed successfully. Created Ansible inventory with droplet IP: $droplet_ip"
+echo "Run hook completed successfully."
 EOT
 }
