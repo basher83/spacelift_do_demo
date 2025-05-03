@@ -1,4 +1,4 @@
-# ansible/inventory/inventory.yml.tpl
+# ansible/inventory/inventory_template.yml.tpl
 all:
   children:
     webservers:
