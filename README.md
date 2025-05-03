@@ -62,7 +62,7 @@ Before using this repository, you need:
 2. Add the following environment variables:
 
    - `TF_VAR_do_token`: Your DigitalOcean API token
-   - `TF_VAR_ssh_fingerprint`: Your SSH key fingerprint from DigitalOcean
+   - `TF_VAR_ssh_fingerprint`: Your SSH key fingerprint from DigitalOcean (eb:54:57:c9:f7:9c:be:2b:4b:e1:69:41:89:d1:ea:b1)
    - `TF_VAR_staging_public_key`: Your SSH public key content
 
 3. Add the following mounted file:
